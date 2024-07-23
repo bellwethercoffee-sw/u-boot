@@ -23,7 +23,7 @@ struct nvme_dev;
  *		-EIO on command execution fails
  */
 int nvme_identify(struct nvme_dev *dev, unsigned nsid,
-		  unsigned cns, dma_addr_t dma_addr);
+		  unsigned cns, void *buffer);
 
 /**
  * nvme_get_features - retrieve the attributes of the feature specified
