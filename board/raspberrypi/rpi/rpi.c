@@ -390,6 +390,33 @@ static void set_board_info(void)
 }
 #endif /* CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG */
 
+static void set_bellweather_coffe_configs(void)
+{
+#warning BELLWETHER_COFFE_MODS_ENABLED
+
+	env_set("stdout","serial");
+	env_set("stderr","serial");
+	env_set("stdin","serial");
+
+        //env_set("boot_dev", "nvme");
+        env_set("boot_dev", "mmc");
+
+	env_set("splashimage", "0x2000000");
+	env_set("splashfile", "/logo.bmp");
+	env_set("load_splash", "load ${boot_dev} 0:1 ${splashimage} ${splashfile}");
+	env_set("preboot", "pci enum; run load_splash; bmp display ${splashimage}");
+
+	env_set("kernel_comp_size", "19259827");
+	env_set("kernel_comp_addr_r", "0x02700000");
+	env_set("fdt_prep", "fdt addr ${fdt_addr}; fdt get value bootargs /chosen bootargs");
+
+	env_set("nvme_boot", "nvme scan; run fdt_prep; run bootargs_prep; load ${boot_dev} 0:1 ${kernel_addr_r} kernel8.img ; booti ${kernel_addr_r} - ${fdt_addr} ");
+
+	env_set("bootargs_prep","setenv bootargs \"${bootargs} console=ttyS0,115200 console=tty3 logo.nologo vt.global_default=0 fbcon=map:1\"");
+        env_set("bootcmd", "run nvme_boot");
+}
+
+
 static void set_serial_number(void)
 {
 	ALLOC_CACHE_ALIGN_BUFFER(struct msg_get_board_serial, msg, 1);
@@ -423,6 +450,7 @@ int misc_init_r(void)
 	set_board_info();
 #endif
 	set_serial_number();
+	set_bellweather_coffe_configs();
 
 	return 0;
 }
